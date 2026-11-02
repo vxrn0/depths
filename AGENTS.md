@@ -11,6 +11,8 @@ python3 -m depths          # auto-detects rendering mode
 python3 -m depths --sixel  # force sixel
 python3 -m depths --auto   # auto-pilot plays itself
 ./play.sh                  # same as python3 -m depths
+./scripts/sim.sh 200       # headless balance run
+python3 -m unittest discover -s tests
 ```
 
 Rendering modes, in order: kitty (if `$KITTY_WINDOW_ID`), sixel (if detected
