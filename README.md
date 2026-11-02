@@ -65,3 +65,6 @@ has a skill for coding agents.
 
 ## Stack
 Python 3, stdlib + Pillow (only for pixel modes). Developed on 3.14.
+
+## License
+MIT — see [LICENSE.md](LICENSE.md).
