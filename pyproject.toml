@@ -7,6 +7,7 @@ name = "depths-roguelike"
 version = "2.2.0"
 description = "A terminal roguelike with pixel rendering (Kitty graphics protocol / sixel) and a curses fallback"
 readme = "README.md"
+license = { file = "LICENSE.md" }
 requires-python = ">=3.9"
 dependencies = ["pillow"]
 
