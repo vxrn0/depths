@@ -107,23 +107,59 @@ def get_cell_size_cached():
     return _cell_size_cache
 
 
+# Cyrillic letters on a Russian layout, mapped to the Latin key on the same cap.
+_CYRILLIC = {
+    "ц": "w", "ф": "a", "ы": "s", "в": "d",
+    "р": "h", "о": "j", "л": "k", "д": "l",
+    "н": "y", "г": "u", "и": "b", "т": "n",
+    "й": "q", "з": "p", "к": "r", "ш": "i",
+    "м": "v", "с": "c", "ч": "x",
+}
+_CYRILLIC.update({k.upper(): v.upper() for k, v in _CYRILLIC.items()})
+
+_ARROWS = {"A": curses.KEY_UP, "B": curses.KEY_DOWN,
+           "C": curses.KEY_RIGHT, "D": curses.KEY_LEFT}
+
+
+def normalize_key(key):
+    """A Russian-layout letter acts as the Latin key on the same cap."""
+    if 0 < key < 0x10000:
+        latin = _CYRILLIC.get(chr(key))
+        if latin:
+            return ord(latin)
+    return key
+
+
+def _read_char(fd, first):
+    """Finish a UTF-8 sequence: os.read(fd, 1) hands back bare bytes."""
+    n = 4 if first[0] >= 0xF0 else 3 if first[0] >= 0xE0 else 2 if first[0] >= 0xC0 else 1
+    while len(first) < n:
+        more = os.read(fd, n - len(first))
+        if not more:
+            break
+        first += more
+    return first.decode("utf-8", "replace")
+
+
 def read_key(fd):
-    c = os.read(fd, 1).decode('latin1', 'replace')
-    if c == '\x1b':
-        # read rest with timeout
-        buf = c
-        while True:
-            r,_,_ = select.select([fd], [], [], 0.05)
-            if not r: break
-            buf += os.read(fd, 1).decode('latin1', 'replace')
-            if len(buf) > 8: break
-        if buf == '\x1b[A': return curses.KEY_UP
-        if buf == '\x1b[B': return curses.KEY_DOWN
-        if buf == '\x1b[C': return curses.KEY_RIGHT
-        if buf == '\x1b[D': return curses.KEY_LEFT
-        if len(buf) == 1: return ord(buf)
-        return ord(buf[0]) if buf else 0
-    return ord(c)
+    first = os.read(fd, 1)
+    if not first:
+        return 0
+    if first == b"\x1b":
+        buf = b""
+        while len(buf) < 16:
+            r, _, _ = select.select([fd], [], [], 0.05)
+            if not r:
+                break
+            buf += os.read(fd, 1)
+        if not buf:
+            return 27  # a lone Esc
+        if buf[:1] in (b"[", b"O"):
+            # CSI (`ESC [ 1;2A`) and SS3 (`ESC O A`) both end in the arrow letter
+            return _ARROWS.get(chr(buf[-1]), 0)
+        return 0  # unknown escape: ignored, never mistaken for a quit
+    ch = _read_char(fd, first)
+    return normalize_key(ord(ch)) if len(ch) == 1 else 0
 
 
 def _safe_detect_sixel():

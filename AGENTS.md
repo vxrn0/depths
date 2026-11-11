@@ -23,7 +23,7 @@ or `--sixel`), curses fallback.
 | File                  | Contents |
 |-----------------------|----------|
 | `depths/constants.py` | Tile/enemy/item chars, `RGB` (true-color), `COLORS` (256-color), `ENEMY_STATS`, `ENEMY_NAMES`, `BOSSES`, `SHOP_GOODS`, rarity tables + `roll_item`, map geometry (`MAP_TILES_W/H`, `SIDE_W`, `PAD`) |
-| `depths/terminal.py`  | `init_colors`/`Color`/`cp`, pixel-size queries (`get_terminal_pixels`, CSI 14t), `read_key`, sixel detection |
+| `depths/terminal.py`  | `init_colors`/`Color`/`cp`, pixel-size queries (`get_terminal_pixels`, CSI 14t), `read_key` + `normalize_key` (UTF-8, SS3/CSI arrows, Russian layout), sixel detection |
 | `depths/dungeon.py`   | `make_dungeon` (rooms + corridors + secret/locked doors), `place_entities` (enemies, items, traps, stairs, boss, merchant), `biome` |
 | `depths/game.py`      | `Game` class: all rules. Movement, FOV (Bresenham), combat, enemy AI (`enemy_turn`/`enemy_act` + BFS), hunger/regen (`tick`), traps, pickups, shop, inventory, save/load, auto-pilot (`auto_step`), curses drawing |
 | `depths/scores.py`    | Top-5 runs in `~/.depths_high.json` |

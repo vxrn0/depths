@@ -4,7 +4,7 @@ from collections import deque
 
 from .constants import BOSSES, ENEMY_STATS, PLAYER, SHOP_GOODS, SAVE, ename, cap, roll_item, RARITY_256
 from .dungeon import biome, make_dungeon, place_entities
-from .terminal import Color, cp
+from .terminal import Color, cp, normalize_key
 from .render import render_kitty, render_sixel
 
 
@@ -702,6 +702,7 @@ class Game:
                     self.inv_cursor = max(0, len(inv)-1)
 
     def handle_input(self, key):
+        key = normalize_key(key)
         if self.help_open:
             self.help_open = False
             return
