@@ -2,6 +2,8 @@
 
 A roguelike with pixel rendering in the terminal. Stdlib + Pillow.
 
+![depths running in kitty](.github/preview.webp)
+
 ## Run
 
 ```sh
